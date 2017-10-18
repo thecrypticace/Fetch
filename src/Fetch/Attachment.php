@@ -59,7 +59,7 @@ class Attachment
     /**
      * This is the size of the attachment.
      *
-     * @var int
+     * @var ?int
      */
     protected $size;
 
@@ -98,7 +98,7 @@ class Attachment
             $this->setFileName($parameters['name']);
         }
 
-        $this->size = $structure->bytes;
+        $this->size = $structure->bytes ?? null;
 
         $this->mimeType = Message::typeIdToString($structure->type);
 
@@ -151,7 +151,7 @@ class Attachment
     /**
      * This returns the size of the attachment.
      *
-     * @return int
+     * @return ?int
      */
     public function getSize()
     {
