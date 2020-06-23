@@ -221,7 +221,19 @@ class Attachment
         // Fix an issue causing server to throw an error
         // See: https://github.com/tedious/Fetch/issues/74 for more details
         $fetch  = imap_fetchbody($this->imapStream, $this->messageId, $this->partId ?: 1, FT_UID);
-        $result = imap_savebody($this->imapStream, $filePointer, $this->messageId, $this->partId ?: 1, FT_UID);
+
+        try {
+            $result = imap_savebody($this->imapStream, $filePointer, $this->messageId, $this->partId ?: 1, FT_UID);
+        } catch (\Throwable $e) {
+            if ($streamFilter) {
+                stream_filter_remove($streamFilter);
+                $streamFilter = null;
+            }
+
+            ftruncate($filePointer, 0);
+
+            $result = imap_savebody($this->imapStream, $filePointer, $this->messageId, $this->partId ?: 1, FT_UID);
+        }
 
         if ($streamFilter) {
             stream_filter_remove($streamFilter);
